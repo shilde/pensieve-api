@@ -1,0 +1,366 @@
+{
+  "info": {
+    "name": "Pensieve API – Local",
+    "_postman_id": "pensieve-api-local",
+    "description": "Local testing collection for pensieve-api (http://localhost:8080) and pensieve-mind (http://localhost:8081)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "api_url",  "value": "http://localhost:8080", "type": "string" },
+    { "key": "mind_url", "value": "http://localhost:8081", "type": "string" },
+    { "key": "bookmark_id",   "value": "", "type": "string" },
+    { "key": "collection_id", "value": "", "type": "string" },
+    { "key": "tag_id",        "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "API Health",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/actuator/health",
+            "description": "Spring Boot Actuator health check"
+          }
+        },
+        {
+          "name": "Mind Health",
+          "request": {
+            "method": "GET",
+            "url": "{{mind_url}}/health",
+            "description": "pensieve-mind FastAPI health check"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bookmarks",
+      "item": [
+        {
+          "name": "Create Bookmark",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('bookmark_id', body.id);",
+                  "    console.log('bookmark_id set to:', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{api_url}}/api/bookmarks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://kubernetes.io/docs/concepts/overview/\",\n  \"title\": \"Kubernetes Overview\",\n  \"description\": \"Official Kubernetes documentation\",\n  \"tags\": [\"kubernetes\", \"homelab\", \"docs\"],\n  \"collectionId\": null\n}"
+            },
+            "description": "Creates a new bookmark. Automatically stores bookmark_id in collection variable."
+          }
+        },
+        {
+          "name": "Create Bookmark (no title – scraped by mind)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('bookmark_id', body.id);",
+                  "    console.log('bookmark_id set to:', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{api_url}}/api/bookmarks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://spring.io/guides/gs/spring-boot\",\n  \"tags\": [\"spring\", \"kotlin\"]\n}"
+            },
+            "description": "No title provided – pensieve-mind will scrape and fill in the title."
+          }
+        },
+        {
+          "name": "Create Bookmark (invalid URL)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{api_url}}/api/bookmarks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"ftp://invalid-url\",\n  \"title\": \"Should fail\"\n}"
+            },
+            "description": "Expects HTTP 400 – URL must start with http:// or https://"
+          }
+        },
+        {
+          "name": "Get All Bookmarks",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{api_url}}/api/bookmarks?page=0&size=20&sort=createdAt,desc",
+              "host": ["{{api_url}}"],
+              "path": ["api", "bookmarks"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "sort", "value": "createdAt,desc" }
+              ]
+            },
+            "description": "Returns paginated list of all bookmarks."
+          }
+        },
+        {
+          "name": "Get Bookmarks by Collection",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{api_url}}/api/bookmarks?collectionId={{collection_id}}",
+              "host": ["{{api_url}}"],
+              "path": ["api", "bookmarks"],
+              "query": [
+                { "key": "collectionId", "value": "{{collection_id}}" }
+              ]
+            },
+            "description": "Filter bookmarks by collection. Set collection_id variable first."
+          }
+        },
+        {
+          "name": "Get Bookmark by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/api/bookmarks/{{bookmark_id}}",
+            "description": "Get a single bookmark. Uses bookmark_id set by Create Bookmark."
+          }
+        },
+        {
+          "name": "Get Bookmark – Not Found",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/api/bookmarks/00000000-0000-0000-0000-000000000000",
+            "description": "Expects HTTP 404."
+          }
+        },
+        {
+          "name": "Update Bookmark",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{api_url}}/api/bookmarks/{{bookmark_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://kubernetes.io/docs/concepts/overview/\",\n  \"title\": \"Kubernetes Overview (updated)\",\n  \"description\": \"Updated description\",\n  \"tags\": [\"kubernetes\", \"homelab\", \"docs\", \"updated\"],\n  \"collectionId\": null\n}"
+            },
+            "description": "Update title, description, tags or collectionId."
+          }
+        },
+        {
+          "name": "Delete Bookmark",
+          "request": {
+            "method": "DELETE",
+            "url": "{{api_url}}/api/bookmarks/{{bookmark_id}}",
+            "description": "Deletes the bookmark and removes its embedding from Qdrant. Expects HTTP 204."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "item": [
+        {
+          "name": "Create Collection",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const body = pm.response.json();",
+                  "    pm.collectionVariables.set('collection_id', body.id);",
+                  "    console.log('collection_id set to:', body.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{api_url}}/api/collections",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Homelab\",\n  \"description\": \"Everything related to my homelab setup\"\n}"
+            },
+            "description": "Creates a new collection. Automatically stores collection_id."
+          }
+        },
+        {
+          "name": "Create Collection (duplicate name)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{api_url}}/api/collections",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Homelab\",\n  \"description\": \"Duplicate – should fail\"\n}"
+            },
+            "description": "Expects HTTP 400 – name already exists."
+          }
+        },
+        {
+          "name": "Get All Collections",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{api_url}}/api/collections?page=0&size=20&sort=name,asc",
+              "host": ["{{api_url}}"],
+              "path": ["api", "collections"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "sort", "value": "name,asc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Collection by ID",
+          "request": {
+            "method": "GET",
+            "url": "{{api_url}}/api/collections/{{collection_id}}"
+          }
+        },
+        {
+          "name": "Update Collection",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{api_url}}/api/collections/{{collection_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Homelab & Self-Hosting\",\n  \"description\": \"Everything related to my homelab and self-hosted services\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Collection",
+          "request": {
+            "method": "DELETE",
+            "url": "{{api_url}}/api/collections/{{collection_id}}",
+            "description": "Expects HTTP 204. Bookmarks in this collection are NOT deleted – collectionId is set to null."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Semantic Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{api_url}}/api/search?q=how to deploy kubernetes with helm",
+              "host": ["{{api_url}}"],
+              "path": ["api", "search"],
+              "query": [
+                { "key": "q", "value": "how to deploy kubernetes with helm" }
+              ]
+            },
+            "description": "Semantic search over all bookmarks."
+          }
+        },
+        {
+          "name": "Semantic Search with Collection Filter",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{api_url}}/api/search?q=spring boot setup&collectionId={{collection_id}}",
+              "host": ["{{api_url}}"],
+              "path": ["api", "search"],
+              "query": [
+                { "key": "q", "value": "spring boot setup" },
+                { "key": "collectionId", "value": "{{collection_id}}" }
+              ]
+            },
+            "description": "Semantic search scoped to a specific collection."
+          }
+        },
+        {
+          "name": "Search – Empty Query",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{api_url}}/api/search?q=",
+              "host": ["{{api_url}}"],
+              "path": ["api", "search"],
+              "query": [{ "key": "q", "value": "" }]
+            },
+            "description": "Expects HTTP 400."
+          }
+        }
+      ]
+    },
+    {
+      "name": "pensieve-mind (direct)",
+      "item": [
+        {
+          "name": "Embed URL directly",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{mind_url}}/api/embed",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"bookmark_id\": \"a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\",\n  \"url\": \"https://fastapi.tiangolo.com\"\n}"
+            },
+            "description": "Call pensieve-mind directly to test scraping and embedding."
+          }
+        },
+        {
+          "name": "Semantic Search directly",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{mind_url}}/api/search?q=python web framework&limit=5",
+              "host": ["{{mind_url}}"],
+              "path": ["api", "search"],
+              "query": [
+                { "key": "q", "value": "python web framework" },
+                { "key": "limit", "value": "5" }
+              ]
+            },
+            "description": "Call pensieve-mind search directly – returns bookmark IDs and scores."
+          }
+        },
+        {
+          "name": "Delete Embedding directly",
+          "request": {
+            "method": "DELETE",
+            "url": "{{mind_url}}/api/embed/a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+            "description": "Remove an embedding directly from Qdrant."
+          }
+        },
+        {
+          "name": "Mind Swagger UI",
+          "request": {
+            "method": "GET",
+            "url": "{{mind_url}}/docs",
+            "description": "Opens the FastAPI auto-generated Swagger UI."
+          }
+        }
+      ]
+    }
+  ]
+}
