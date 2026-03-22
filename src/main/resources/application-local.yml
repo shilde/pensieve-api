@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pensieve
+    username: pensieve
+    password: pensieve
+  docker:
+    compose:
+      enabled: true
+  #security:
+  #  oauth2:
+  #    resourceserver:
+  #      jwt:
+  #        issuer-uri: https://auth.yourdomain.com/application/o/pensieve/
+
+pensieve:
+  mind:
+    url: http://localhost:8081
