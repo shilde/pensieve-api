@@ -2,6 +2,9 @@ package de.shcreative.pensieve.tag.api
 
 import de.shcreative.pensieve.tag.api.dto.TagResponse
 import de.shcreative.pensieve.tag.domain.TagService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,12 +21,18 @@ class TagController(
 ) {
 
     @GetMapping
-    fun findAll(): List<TagResponse> =
-        tagService.findAll().map { it.toResponse() }
+    fun findAll(
+        @PageableDefault(size = 50, sort = ["name"]) pageable: Pageable
+    ): Page<TagResponse> =
+        tagService.findAll(pageable).map { it.toResponse() }
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: UUID): TagResponse =
         tagService.findById(id).toResponse()
+
+    @GetMapping("/by-name/{name}")
+    fun findByName(@PathVariable name: String): TagResponse =
+        tagService.findByName(name).toResponse()
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
