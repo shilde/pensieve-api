@@ -3,13 +3,7 @@ package de.shcreative.pensieve.bookmark.persistence
 import de.shcreative.pensieve.bookmark.domain.Bookmark
 import de.shcreative.pensieve.collection.domain.Collection
 import de.shcreative.pensieve.collection.persistence.CollectionEntity
-import de.shcreative.pensieve.tag.domain.Tag
-import de.shcreative.pensieve.tag.persistence.TagEntity
-
-private fun TagEntity.toDomain() = Tag(
-    id = id,
-    name = name
-)
+import de.shcreative.pensieve.tag.persistence.toDomain
 
 private fun CollectionEntity.toDomain() = Collection(
     id = id,
