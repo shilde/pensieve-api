@@ -7,6 +7,6 @@ data class BookmarkRequest(
     @field:NotBlank val url: String,
     val title: String?,
     val description: String?,
-    val tags: Set<String> = emptySet(),
+    val tags: Set<String>? = null,
     val collectionId: UUID? = null
 )

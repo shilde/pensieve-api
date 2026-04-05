@@ -20,21 +20,21 @@ class TagController(
     private val tagService: TagService
 ) {
 
-    @GetMapping
+    @GetMapping(version = "1.0")
     fun findAll(
         @PageableDefault(size = 50, sort = ["name"]) pageable: Pageable
     ): Page<TagResponse> =
         tagService.findAll(pageable).map { it.toResponse() }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}", version = "1.0")
     fun findById(@PathVariable id: UUID): TagResponse =
         tagService.findById(id).toResponse()
 
-    @GetMapping("/by-name/{name}")
+    @GetMapping("/by-name/{name}", version = "1.0")
     fun findByName(@PathVariable name: String): TagResponse =
         tagService.findByName(name).toResponse()
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}", version = "1.0")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: UUID) =
         tagService.delete(id)

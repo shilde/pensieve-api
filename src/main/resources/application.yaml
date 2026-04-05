@@ -12,6 +12,12 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  mvc:
+    apiversion:
+      use:
+        header: X-API-Version
+      supported: 1.0
+      default: 1.0
   #security:
   #  oauth2:
   #    resourceserver:

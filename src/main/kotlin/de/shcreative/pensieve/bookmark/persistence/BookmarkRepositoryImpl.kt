@@ -5,13 +5,16 @@ import de.shcreative.pensieve.bookmark.domain.BookmarkRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Repository
+@Transactional(readOnly = true)
 class BookmarkRepositoryImpl(
     private val jpa: BookmarkJpaRepository
 ) : BookmarkRepository {
 
+    @Transactional
     override fun save(bookmark: Bookmark): Bookmark =
         jpa.save(bookmark.toEntity()).toDomain()
 
@@ -36,6 +39,7 @@ class BookmarkRepositoryImpl(
     override fun existsByUrl(url: String): Boolean =
         jpa.existsByUrl(url)
 
+    @Transactional
     override fun delete(id: UUID) =
         jpa.deleteById(id)
 }

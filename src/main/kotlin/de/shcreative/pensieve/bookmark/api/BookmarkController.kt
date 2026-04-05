@@ -28,12 +28,12 @@ class BookmarkController(
     private val bookmarkService: BookmarkService
 ) {
 
-    @PostMapping
+    @PostMapping(version = "1.0")
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun create(@Valid @RequestBody request: BookmarkRequest): BookmarkResponse =
         bookmarkService.create(request.toDomain()).toResponse()
 
-    @GetMapping
+    @GetMapping(version = "1.0")
     fun findAll(
         @PageableDefault(size = 20, sort = ["createdAt"]) pageable: Pageable,
         @RequestParam(required = false) collectionId: UUID?
@@ -44,18 +44,18 @@ class BookmarkController(
             bookmarkService.findAll(pageable).map { it.toResponse() }
         }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}", version = "1.0")
     fun findById(@PathVariable id: UUID): BookmarkResponse =
         bookmarkService.findById(id).toResponse()
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}", version = "1.0")
     fun update(
         @PathVariable id: UUID,
         @Valid @RequestBody request: BookmarkRequest
     ): BookmarkResponse =
         bookmarkService.update(id, request.toDomain()).toResponse()
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}", version = "1.0")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     suspend fun delete(@PathVariable id: UUID) =
         bookmarkService.delete(id)

@@ -17,7 +17,7 @@ class SearchController(
     private val searchService: SearchService
 ) {
 
-    @GetMapping
+    @GetMapping(version = "1.0")
     suspend fun search(
         @RequestParam q: String,
         @RequestParam(required = false) collectionId: UUID?,

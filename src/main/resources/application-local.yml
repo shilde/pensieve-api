@@ -14,4 +14,4 @@ spring:
 
 pensieve:
   mind:
-    url: http://localhost:8081
+    url: http://localhost:8000

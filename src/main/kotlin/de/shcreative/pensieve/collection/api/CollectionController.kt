@@ -24,24 +24,24 @@ class CollectionController(
     private val collectionService: CollectionService
 ) {
 
-    @PostMapping
+    @PostMapping(version = "1.0")
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@Valid @RequestBody request: CollectionRequest): CollectionResponse =
         collectionService.create(request.toDomain()).toResponse()
 
-    @GetMapping
+    @GetMapping(version = "1.0")
     fun findAll(pageable: Pageable): Page<CollectionResponse> =
         collectionService.findAll(pageable).map { it.toResponse() }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}", version = "1.0")
     fun findById(@PathVariable id: UUID): CollectionResponse =
         collectionService.findById(id).toResponse()
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}", version = "1.0")
     fun update(@PathVariable id: UUID, @Valid @RequestBody request: CollectionRequest): CollectionResponse =
         collectionService.update(id, request.toDomain()).toResponse()
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}", version = "1.0")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(@PathVariable id: UUID) =
         collectionService.delete(id)
