@@ -2,6 +2,8 @@ package de.shcreative.pensieve.bookmark.persistence
 
 import de.shcreative.pensieve.bookmark.domain.Bookmark
 import de.shcreative.pensieve.bookmark.domain.BookmarkRepository
+import de.shcreative.pensieve.collection.persistence.CollectionEntity
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
@@ -11,12 +13,18 @@ import java.util.UUID
 @Repository
 @Transactional(readOnly = true)
 class BookmarkRepositoryImpl(
-    private val jpa: BookmarkJpaRepository
+    private val jpa: BookmarkJpaRepository,
+    private val entityManager: EntityManager
 ) : BookmarkRepository {
 
     @Transactional
-    override fun save(bookmark: Bookmark): Bookmark =
-        jpa.save(bookmark.toEntity()).toDomain()
+    override fun save(bookmark: Bookmark): Bookmark {
+        val entity = bookmark.toEntity()
+        if (bookmark.collectionId != null) {
+            entity.collection = entityManager.getReference(CollectionEntity::class.java, bookmark.collectionId)
+        }
+        return jpa.save(entity).toDomain()
+    }
 
     override fun findById(id: UUID): Bookmark? =
         jpa.findById(id).orElse(null)?.toDomain()

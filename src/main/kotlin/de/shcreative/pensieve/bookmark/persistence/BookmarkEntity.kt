@@ -30,7 +30,7 @@ class BookmarkEntity(
     val tags: MutableSet<TagEntity> = mutableSetOf(),
     @ManyToOne
     @JoinColumn(name = "collection_id")
-    val collection: CollectionEntity? = null,
+    var collection: CollectionEntity? = null,
     val createdAt: Instant = Instant.now(),
     val updatedAt: Instant = Instant.now()
 )

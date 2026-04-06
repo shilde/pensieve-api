@@ -1,7 +1,6 @@
 package de.shcreative.pensieve.bookmark.domain
 
 import de.shcreative.pensieve.tag.domain.Tag
-import de.shcreative.pensieve.collection.domain.Collection
 import java.util.UUID
 import java.time.Instant
 
@@ -13,7 +12,7 @@ data class Bookmark (
     val content: String?,
     val embeddingId: UUID?,
     val tags: Set<Tag>,
-    val collection: Collection?,
+    val collectionId: UUID?,
     val createdAt: Instant,
     val updatedAt: Instant
 )

@@ -48,7 +48,8 @@ class BookmarkService(
                 title = updated.title,
                 description = updated.description,
                 updatedAt = Instant.now(),
-                tags = tags
+                tags = tags,
+                collectionId = updated.collectionId
             )
         )
     }

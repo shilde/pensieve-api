@@ -14,7 +14,7 @@ fun BookmarkRequest.toDomain() = Bookmark(
     content = null,
     embeddingId = null,
     tags = emptySet(),
-    collection = null,
+    collectionId = collectionId,
     createdAt = Instant.now(),
     updatedAt = Instant.now()
 )
@@ -25,6 +25,6 @@ fun Bookmark.toResponse() = BookmarkResponse(
     title = title,
     description = description,
     tags = tags.map { it.name }.toSet(),
-    collectionId = collection?.id,
+    collectionId = collectionId,
     createdAt = createdAt
 )
