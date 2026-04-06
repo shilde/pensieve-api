@@ -4,6 +4,7 @@ import de.shcreative.pensieve.bookmark.domain.Bookmark
 import de.shcreative.pensieve.collection.domain.Collection
 import de.shcreative.pensieve.collection.persistence.CollectionEntity
 import de.shcreative.pensieve.tag.persistence.toDomain
+import de.shcreative.pensieve.tag.persistence.toEntity
 
 private fun CollectionEntity.toDomain() = Collection(
     id = id,
@@ -33,5 +34,6 @@ fun Bookmark.toEntity() = BookmarkEntity(
     title = title,
     description = description,
     content = content,
-    embeddingId = embeddingId
+    embeddingId = embeddingId,
+    tags = tags.map { it.toEntity() }.toMutableSet()
 )

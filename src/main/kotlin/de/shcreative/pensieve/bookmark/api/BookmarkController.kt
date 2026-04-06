@@ -31,7 +31,7 @@ class BookmarkController(
     @PostMapping(version = "1.0")
     @ResponseStatus(HttpStatus.CREATED)
     suspend fun create(@Valid @RequestBody request: BookmarkRequest): BookmarkResponse =
-        bookmarkService.create(request.toDomain()).toResponse()
+        bookmarkService.create(request.toDomain(), request.tags ?: emptySet()).toResponse()
 
     @GetMapping(version = "1.0")
     fun findAll(
@@ -53,7 +53,7 @@ class BookmarkController(
         @PathVariable id: UUID,
         @Valid @RequestBody request: BookmarkRequest
     ): BookmarkResponse =
-        bookmarkService.update(id, request.toDomain()).toResponse()
+        bookmarkService.update(id, request.toDomain(), request.tags ?: emptySet()).toResponse()
 
     @DeleteMapping("/{id}", version = "1.0")
     @ResponseStatus(HttpStatus.NO_CONTENT)

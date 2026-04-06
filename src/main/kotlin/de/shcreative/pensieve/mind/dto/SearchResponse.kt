@@ -1,9 +1,10 @@
 package de.shcreative.pensieve.mind.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.UUID
 
 data class SearchResultDto(
-    val bookmarkId: UUID,
+    @JsonProperty("bookmark_id") val bookmarkId: UUID,
     val score: Double
 )
 

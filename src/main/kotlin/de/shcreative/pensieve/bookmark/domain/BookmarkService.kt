@@ -1,6 +1,7 @@
 package de.shcreative.pensieve.bookmark.domain
 
 import de.shcreative.pensieve.mind.MindClient
+import de.shcreative.pensieve.tag.domain.TagService
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -11,12 +12,14 @@ import java.util.UUID
 @Service
 class BookmarkService(
     private val bookmarkRepository: BookmarkRepository,
+    private val tagService: TagService,
     private val mindClient: MindClient
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    suspend fun create(bookmark: Bookmark): Bookmark {
-        val saved = bookmarkRepository.save(bookmark)
+    suspend fun create(bookmark: Bookmark, tagNames: Set<String> = emptySet()): Bookmark {
+        val tags = tagNames.map { tagService.findOrCreate(it) }.toSet()
+        val saved = bookmarkRepository.save(bookmark.copy(tags = tags))
 
         try {
             val embeddingResponse = mindClient.enqueueEmbedding(saved.id, saved.url)
@@ -36,14 +39,16 @@ class BookmarkService(
     fun findAllByCollectionId(collectionId: UUID, pageable: Pageable): Page<Bookmark> =
         bookmarkRepository.findAllByCollectionId(collectionId, pageable)
 
-    fun update(id: UUID, updated: Bookmark): Bookmark {
+    fun update(id: UUID, updated: Bookmark, tagNames: Set<String> = emptySet()): Bookmark {
         val existing = findById(id)
+        val tags = tagNames.map { tagService.findOrCreate(it) }.toSet()
         return bookmarkRepository.save(
             existing.copy(
                 url = updated.url,
                 title = updated.title,
                 description = updated.description,
-                updatedAt = Instant.now()
+                updatedAt = Instant.now(),
+                tags = tags
             )
         )
     }

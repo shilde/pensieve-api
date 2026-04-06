@@ -8,3 +8,9 @@ fun TagEntity.toDomain(bookmarkCount: Int = 0) = Tag(
     bookmarkCount = bookmarkCount,
     createdAt = createdAt,
 )
+
+fun Tag.toEntity() = TagEntity(
+    id = id,
+    name = name,
+    createdAt = createdAt,
+)

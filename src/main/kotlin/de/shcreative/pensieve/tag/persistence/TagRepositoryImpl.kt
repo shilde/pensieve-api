@@ -27,6 +27,11 @@ class TagRepositoryImpl(
             entity.toDomain(bookmarkCount = jpa.countBookmarks(entity.id))
         }
 
+    override fun save(tag: Tag): Tag {
+        val entity = tag.toEntity()
+        return jpa.save(entity).toDomain(bookmarkCount = 0)
+    }
+
     override fun delete(id: UUID) =
         jpa.deleteById(id)
 }

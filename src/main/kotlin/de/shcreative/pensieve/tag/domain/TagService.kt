@@ -3,6 +3,7 @@ package de.shcreative.pensieve.tag.domain
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.util.UUID
 
 @Service
@@ -18,6 +19,16 @@ class TagService(
     fun findByName(name: String): Tag =
         tagRepository.findByName(name)
             ?: throw NoSuchElementException("Tag '$name' not found")
+
+    fun findOrCreate(name: String): Tag =
+        tagRepository.findByName(name) ?: tagRepository.save(
+            Tag(
+                id = UUID.randomUUID(),
+                name = name,
+                bookmarkCount = 0,
+                createdAt = Instant.now()
+            )
+        )
 
     fun delete(id: UUID) {
         findById(id)

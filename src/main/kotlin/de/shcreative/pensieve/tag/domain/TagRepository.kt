@@ -8,5 +8,6 @@ interface TagRepository {
     fun findAll(pageable: Pageable): Page<Tag>
     fun findById(id: UUID): Tag?
     fun findByName(name: String): Tag?
+    fun save(tag: Tag): Tag
     fun delete(id: UUID)
 }
